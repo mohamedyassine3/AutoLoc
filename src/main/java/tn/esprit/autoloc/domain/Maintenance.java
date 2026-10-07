@@ -27,7 +27,7 @@ public class Maintenance {
     @Column(length = 255)
     private String description;
 
-    // Maintenance N --- 1 Vehicule
+    // Maintenance N --> 1 Vehicule (association unidirectionnelle, comme dans le modele)
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_vehicule", nullable = false)
     private Vehicule vehicule;

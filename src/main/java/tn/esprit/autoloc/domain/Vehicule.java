@@ -54,11 +54,6 @@ public class Vehicule {
     @JsonIgnore
     private List<Reservation> reservations = new ArrayList<>();
 
-    // Vehicule 1 --- N Maintenance (une maintenance n'existe pas sans son vehicule)
-    @OneToMany(mappedBy = "vehicule", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
-    private List<Maintenance> maintenances = new ArrayList<>();
-
     // Vehicule N --- N Equipement (table de jointure vehicule_equipement)
     @ManyToMany
     @JoinTable(

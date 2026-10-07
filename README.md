@@ -36,9 +36,9 @@ Java 17, Maven, Spring Boot 3 (Web, Data JPA, Validation), MySQL 8, Lombok.
 | Agence → Employe | OneToMany / ManyToOne | `employe.id_agence` |
 | Client → Reservation | OneToMany / ManyToOne | `reservation.id_client` |
 | Vehicule → Reservation | OneToMany / ManyToOne | `reservation.id_vehicule` |
-| Vehicule → Maintenance | OneToMany / ManyToOne | `maintenance.id_vehicule` |
+| Maintenance → Vehicule | ManyToOne (unidirectionnelle) | `maintenance.id_vehicule` |
 | Reservation ↔ Contrat | OneToOne | `contrat.id_reservation` (unique) |
 | Contrat → Paiement | OneToMany / ManyToOne | `paiement.id_contrat` |
 | Vehicule ↔ Equipement | ManyToMany | table `vehicule_equipement` |
 
-Choix : toutes les associations `@ManyToOne` sont en `LAZY` ; les collections ne sont pas sérialisées en JSON (`@JsonIgnore`) ; la cascade n'est utilisée que pour les entités dépendantes (Contrat → Paiement, Reservation → Contrat, Vehicule → Maintenance).
+Choix : le modèle suit le diagramme de classes du cours. Toutes les `@ManyToOne` sont en `LAZY` ; les collections ne sont pas sérialisées en JSON (`@JsonIgnore`) ; la seule composition (losange noir) est Contrat ◆ Paiement, d'où `cascade = ALL` et `orphanRemoval` uniquement sur `Contrat.paiements`.

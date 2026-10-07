@@ -41,7 +41,7 @@ public class Reservation {
     private Vehicule vehicule;
 
     // Reservation 1 --- 1 Contrat (cote inverse : la cle etrangere est dans Contrat)
-    @OneToOne(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "reservation")
     @JsonIgnore
     private Contrat contrat;
 }
