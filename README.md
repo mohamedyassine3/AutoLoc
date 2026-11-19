@@ -17,7 +17,7 @@ Plateforme de gestion de location de véhicules multi-agences (projet « autoloc
 
 ## Stack technique
 
-Java 17, Maven, Spring Boot 3 (Web, Data JPA, Validation), MySQL 8, Lombok.
+Java 17, Maven, Spring Boot 3.3.4 (Web, Data JPA, Validation), MySQL 8, Lombok, springdoc-openapi (Swagger UI).
 
 ## Lancer le projet
 
@@ -27,18 +27,39 @@ Java 17, Maven, Spring Boot 3 (Web, Data JPA, Validation), MySQL 8, Lombok.
    - Linux / macOS : `export DB_PASSWORD=votre_mot_de_passe`
    - (optionnel) `DB_USERNAME`, par défaut `root`.
 3. Lancer `AutolocApiApplication` depuis IntelliJ, ou `./mvnw spring-boot:run`.
+4. L'application écoute sur le port **8089** avec le contexte `/autoloc`.
 
-## Modèle de données (Atelier 2)
+## Documentation de l'API (Swagger)
 
-| Association | Type | Côté propriétaire (clé étrangère) |
-|---|---|---|
-| Agence → Vehicule | OneToMany / ManyToOne | `vehicule.id_agence` |
-| Agence → Employe | OneToMany / ManyToOne | `employe.id_agence` |
-| Client → Reservation | OneToMany / ManyToOne | `reservation.id_client` |
-| Vehicule → Reservation | OneToMany / ManyToOne | `reservation.id_vehicule` |
-| Maintenance → Vehicule | ManyToOne (unidirectionnelle) | `maintenance.id_vehicule` |
-| Reservation ↔ Contrat | OneToOne | `contrat.id_reservation` (unique) |
-| Contrat → Paiement | OneToMany / ManyToOne | `paiement.id_contrat` |
-| Vehicule ↔ Equipement | ManyToMany | table `vehicule_equipement` |
+- Swagger UI : <http://localhost:8089/autoloc/swagger-ui/index.html>
+- Spécification OpenAPI : <http://localhost:8089/autoloc/v3/api-docs>
 
-Choix : le modèle suit le diagramme de classes du cours. Toutes les `@ManyToOne` sont en `LAZY` ; les collections ne sont pas sérialisées en JSON (`@JsonIgnore`) ; la seule composition (losange noir) est Contrat ◆ Paiement, d'où `cascade = ALL` et `orphanRemoval` uniquement sur `Contrat.paiements`.
+## Architecture en couches
+
+```
+tn.esprit.autoloc
+├── domain                    entités JPA et énumérations
+├── repository                Spring Data JPA (un repository par entité)
+├── service                   logique métier (ICrudService<T, ID> + un service par entité)
+│   ├── validation            règles de validation (VehiculeValidator)
+│   ├── logging               journalisation (JournalisationService)
+│   ├── tarification          patron Strategy (politiques de prix)
+│   └── isp                   interfaces spécialisées (ISP)
+├── factory                   patron Factory (factures)
+└── web.controller            contrôleurs REST
+```
+
+## API REST (Atelier 3)
+
+CRUD complet pour chaque entité : `GET` (liste), `GET /{id}`, `POST`, `PUT`, `DELETE /{id}`.
+
+| Ressource | Chemin |
+|---|---|
+| Agences | `/agences` |
+| Clients | `/clients` |
+| Contrats | `/contrats` |
+| Employés | `/employes` |
+| Équipements | `/equipements` |
+| Maintenances | `/maintenances` |
+| Paiements | `/paiements` |
+| Réservations |
