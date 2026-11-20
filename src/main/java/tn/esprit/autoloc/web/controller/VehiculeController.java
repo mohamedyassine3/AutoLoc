@@ -13,40 +13,55 @@ import java.util.List;
 @RestController
 @RequestMapping("/vehicules")
 @RequiredArgsConstructor
-
 public class VehiculeController {
+
     private final VehiculeService vehiculeService;
 
     @Operation(summary = "Lister les véhicules", description = "Retourne tous les véhicules")
-
     @GetMapping
     public List<Vehicule> getAll() {
         return vehiculeService.retrieveAll();
     }
-    @Operation(summary = "retrouver un véhicules", description = "Retourne un véhicules par id")
 
+    @Operation(summary = "Retrouver un véhicule", description = "Retourne un véhicule par id")
     @GetMapping("/{id}")
     public Vehicule getOne(@PathVariable Long id) {
         return vehiculeService.retrieve(id);
     }
 
     @Operation(summary = "Créer un véhicule")
-
     @PostMapping
-    public  Vehicule  create(@RequestBody  Vehicule  v) {
+    public Vehicule create(@RequestBody Vehicule v) {
         return vehiculeService.add(v);
     }
-    @Operation( description = "modifier un véhicule")
 
+    @Operation(summary = "Modifier un véhicule")
     @PutMapping
-    public  Vehicule  update(@RequestBody  Vehicule  v)  {
+    public Vehicule update(@RequestBody Vehicule v) {
         return vehiculeService.modify(v);
     }
-    @Operation(summary = "Supprimer un véhicule")
 
+    @Operation(summary = "Supprimer un véhicule")
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
         vehiculeService.remove(id);
     }
 
+    @Operation(summary = "Affecter un véhicule à une agence")
+    @PutMapping("/{idVehicule}/agence/{idAgence}")
+    public Vehicule affecterVehicule(@PathVariable Long idVehicule, @PathVariable Long idAgence) {
+        return vehiculeService.affecterVehicule(idVehicule, idAgence);
+    }
+
+    @Operation(summary = "Installer un équipement sur un véhicule")
+    @PutMapping("/{idVehicule}/equipements/{idEquipement}")
+    public Vehicule affecterEquipement(@PathVariable Long idVehicule, @PathVariable Long idEquipement) {
+        return vehiculeService.affecterEquipement(idVehicule, idEquipement);
+    }
+
+    @Operation(summary = "Retirer un équipement d'un véhicule")
+    @DeleteMapping("/{idVehicule}/equipements/{idEquipement}")
+    public Vehicule desaffecterEquipement(@PathVariable Long idVehicule, @PathVariable Long idEquipement) {
+        return vehiculeService.desaffecterEquipement(idVehicule, idEquipement);
+    }
 }

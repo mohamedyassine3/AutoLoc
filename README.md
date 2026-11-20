@@ -63,3 +63,16 @@ CRUD complet pour chaque entité : `GET` (liste), `GET /{id}`, `POST`, `PUT`, `D
 | Maintenances | `/maintenances` |
 | Paiements | `/paiements` |
 | Réservations |
+
+## Affectations et désaffectations
+
+| Méthode | Chemin | Rôle |
+|---|---|---|
+| PUT | `/employes/{idEmploye}/desaffecter` | Retire l'employé de son agence |
+| PUT | `/employes/{idEmploye}/affecter/{idAgence}` | Affecte l'employé à une agence (il ne doit appartenir à aucune agence) |
+| PUT | `/vehicules/{idVehicule}/agence/{idAgence}` | Rattache un véhicule à une agence |
+| PUT | `/vehicules/{idVehicule}/equipements/{idEquipement}` | Installe un équipement sur un véhicule |
+| DELETE | `/vehicules/{idVehicule}/equipements/{idEquipement}` | Retire l'équipement du véhicule |
+
+Règle métier : un employé appartient à une seule agence à la fois ; un transfert passe donc par une désaffectation puis une affectation.
+Choix de conception : l'association `agence` est optionnelle pour `Employe` et `Vehicule` (un employé désaffecté ou un véhicule neuf n'a pas encore d'agence). Côté ManyToMany, `Vehicule` est propriétaire de la table `vehicule_equipement`.

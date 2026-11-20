@@ -45,8 +45,8 @@ public class Vehicule {
     private StatutVehicule statut;
 
     // Vehicule N --- 1 Agence
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "id_agence", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_agence")
     private Agence agence;
 
     // Vehicule 1 --- N Reservation

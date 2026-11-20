@@ -2,7 +2,12 @@ package tn.esprit.autoloc.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import tn.esprit.autoloc.domain.Agence;
+import tn.esprit.autoloc.domain.Equipement;
 import tn.esprit.autoloc.domain.Vehicule;
+import tn.esprit.autoloc.repository.AgenceRepository;
+import tn.esprit.autoloc.repository.EquipementRepository;
 import tn.esprit.autoloc.repository.VehiculeRepository;
 import tn.esprit.autoloc.service.isp.ConsultationVehicule;
 import tn.esprit.autoloc.service.isp.MutationVehicule;
@@ -18,6 +23,8 @@ public class VehiculeService implements ICrudService<Vehicule, Long>, Consultati
     private final VehiculeRepository vehiculeRepository;
     private final VehiculeValidator vehiculeValidator;
     private final JournalisationService journalisationService;
+    private final AgenceRepository agenceRepository;
+    private final EquipementRepository equipementRepository;
 
     @Override
     public List<Vehicule> retrieveAll() {
@@ -71,5 +78,47 @@ public class VehiculeService implements ICrudService<Vehicule, Long>, Consultati
     @Override
     public void supprimer(Long id) {
         remove(id);
+    }
+
+    // ---------- Associations (TP : affectations) ----------
+
+    /** Scénario 2 : un véhicule neuf est rattaché à une agence (ex. Sfax). */
+    @Transactional
+    public Vehicule affecterVehicule(Long idVehicule, Long idAgence) {
+        Vehicule vehicule = retrieve(idVehicule);
+        Agence agence = agenceRepository.findById(idAgence)
+                .orElseThrow(() -> new RuntimeException("Agence introuvable : " + idAgence));
+        vehicule.setAgence(agence);
+        journalisationService.info("Véhicule {} affecté à l'agence {}", idVehicule, idAgence);
+        return vehiculeRepository.save(vehicule);
+    }
+
+    /** Scénario 3 : l'agent installe un équipement (ex. siège bébé) sur le véhicule. */
+    @Transactional
+    public Vehicule affecterEquipement(Long idVehicule, Long idEquipement) {
+        Vehicule vehicule = retrieve(idVehicule);
+        Equipement equipement = equipementRepository.findById(idEquipement)
+                .orElseThrow(() -> new RuntimeException("Équipement introuvable : " + idEquipement));
+        if (vehicule.getEquipements().contains(equipement)) {
+            throw new IllegalStateException("L'équipement " + idEquipement
+                    + " est déjà installé sur le véhicule " + idVehicule);
+        }
+        vehicule.getEquipements().add(equipement);
+        journalisationService.info("Équipement {} installé sur le véhicule {}", idEquipement, idVehicule);
+        return vehiculeRepository.save(vehicule);
+    }
+
+    /** Scénario 3 : l'agent retire l'équipement au retour du véhicule. */
+    @Transactional
+    public Vehicule desaffecterEquipement(Long idVehicule, Long idEquipement) {
+        Vehicule vehicule = retrieve(idVehicule);
+        Equipement equipement = equipementRepository.findById(idEquipement)
+                .orElseThrow(() -> new RuntimeException("Équipement introuvable : " + idEquipement));
+        if (!vehicule.getEquipements().remove(equipement)) {
+            throw new IllegalStateException("L'équipement " + idEquipement
+                    + " n'est pas installé sur le véhicule " + idVehicule);
+        }
+        journalisationService.info("Équipement {} retiré du véhicule {}", idEquipement, idVehicule);
+        return vehiculeRepository.save(vehicule);
     }
 }

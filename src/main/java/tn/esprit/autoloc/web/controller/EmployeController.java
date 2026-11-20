@@ -9,42 +9,54 @@ import tn.esprit.autoloc.service.EmployeService;
 
 import java.util.List;
 
-@Tag(name = "Employes", description = "Gestion des employes")
+@Tag(name = "Employes", description = "Gestion des employés")
 @RestController
 @RequestMapping("/employes")
 @RequiredArgsConstructor
 public class EmployeController {
 
     private final EmployeService employeService;
-    @Operation(summary = "Lister les employes ", description = "Retourne tous les employes")
 
+    @Operation(summary = "Lister les employés", description = "Retourne tous les employés")
     @GetMapping
     public List<Employe> getAll() {
         return employeService.retrieveAll();
     }
-    @Operation(summary = "Retourner employes ", description = "retourne employes")
 
+    @Operation(summary = "Retourner un employé", description = "Retourne un employé par id")
     @GetMapping("/{id}")
     public Employe getOne(@PathVariable Long id) {
         return employeService.retrieve(id);
     }
-    @Operation(summary = "Ajouter employes ", description = "ajoute employes")
 
-
+    @Operation(summary = "Ajouter un employé")
     @PostMapping
     public Employe create(@RequestBody Employe e) {
         return employeService.add(e);
     }
-    @Operation(summary = "Modifier employes ", description = "modifie employes")
 
+    @Operation(summary = "Modifier un employé")
     @PutMapping
     public Employe update(@RequestBody Employe e) {
         return employeService.modify(e);
     }
-    @Operation(summary = "Supprimer employes ", description = "supprime employes")
 
+    @Operation(summary = "Supprimer un employé")
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
         employeService.remove(id);
+    }
+
+    @Operation(summary = "Désaffecter un employé", description = "Retire l'employé de son agence actuelle")
+    @PutMapping("/{idEmploye}/desaffecter")
+    public Employe desaffecter(@PathVariable Long idEmploye) {
+        return employeService.desaffecterEmploye(idEmploye);
+    }
+
+    @Operation(summary = "Affecter un employé à une agence",
+            description = "L'employé ne doit appartenir à aucune agence (désaffecter d'abord)")
+    @PutMapping("/{idEmploye}/affecter/{idAgence}")
+    public Employe affecter(@PathVariable Long idEmploye, @PathVariable Long idAgence) {
+        return employeService.affecterEmploye(idEmploye, idAgence);
     }
 }
